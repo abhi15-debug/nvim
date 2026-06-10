@@ -32,3 +32,17 @@ vim.opt.showmode = false
 
 -- No automatic comment insertion
 vim.cmd([[autocmd FileType * set formatoptions-=ro]])
+
+
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN]  = "",
+      [vim.diagnostic.severity.INFO]  = "",
+      [vim.diagnostic.severity.HINT]  = "",
+    },
+  },
+  float = { border = "rounded" },
+})

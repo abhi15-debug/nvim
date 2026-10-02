@@ -1,35 +1,43 @@
 return {
   "nvim-telescope/telescope.nvim",
   tag = "0.1.5",
-  dependencies = { 
+  dependencies = {
     "nvim-lua/plenary.nvim",
-    "ahmedkhalf/project.nvim" -- 1. Add the project manager as a dependency
+    "ahmedkhalf/project.nvim" 
   },
   module = "telescope",
 
   config = function()
-    -- 2. Initialize the project manager plugin first
+    -- FIX: This tells Neovim to ACTUALLY change directories to your project folder
     require("project_nvim").setup({
-      manual_mode = false, -- Automatically discovers git repos you open
+      manual_mode = false, 
       detection_methods = { "lsp", "pattern" },
       patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json" },
+      
+      -- Add these lines to force Neovim to update its internal path automatically
+      sync_root_with_cwd = true,
+      respect_buf_cwd = true,
+      update_focused_file = {
+        enable = true,
+        update_root = true
+      },
     })
 
     require('telescope').setup({})
-
-    -- 3. Load the project extension into telescope
     require('telescope').load_extension('projects')
 
     local builtin = require('telescope.builtin')
 
+    -- All keys now pull from Neovim's corrected path!
     vim.keymap.set("n", "<leader>fg", builtin.git_files, {})
     vim.keymap.set("n", "<leader>fr", builtin.live_grep, {})
     vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
     vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
     vim.keymap.set("n", "<leader>fo", builtin.oldfiles, {})
-    vim.keymap.set("n", "<leader>fh", ":Telescope find_files hidden=true <CR>")
-
-    -- 4. VS CODE STYLE: Hotkey to view and switch recent projects
+    vim.keymap.set("n", "<leader>fh", function() builtin.find_files({ hidden = true }) end, {})
+    
+    -- Remapped fG to look at your current directory instead of "~"
+    vim.keymap.set("n", "<leader>fG", builtin.find_files, {})
     vim.keymap.set("n", "<leader>fp", ":Telescope projects<CR>", { desc = "Recent Projects" })
 
     vim.keymap.set('n', '<leader>pws', function()

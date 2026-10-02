@@ -1,30 +1,24 @@
 return {
-  {
-    'numToStr/Comment.nvim',
-
-    config = function()
-      require('Comment').setup {
-        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
-        padding = true,
-        sticky = true,
-        ignore = nil,
-        toggler = {
-          ---Line-comment toggle keymap
-          line = 'gcc',
-          ---Block-comment toggle keymap
-          block = 'gbc',
-        },
-      }
-    end
-  },
-
-  {
-    'JoosepAlviste/nvim-ts-context-commentstring',
-
-    config = function()
-      require('ts_context_commentstring').setup {
+  'numToStr/Comment.nvim',
+  event = { "BufReadPre", "BufNewFile" },
+  dependencies = {
+    {
+      'JoosepAlviste/nvim-ts-context-commentstring',
+      opts = {
         enable_autocmd = false,
-      }
-    end
-  }
+      },
+    },
+  },
+  config = function()
+    local ok, ts_comment = pcall(
+      require,
+      'ts_context_commentstring.integrations.comment_nvim'
+    )
+
+    require('Comment').setup({
+      pre_hook = ok and ts_comment.create_pre_hook() or nil,
+      padding = true,
+      sticky = true,
+    })
+  end,
 }
